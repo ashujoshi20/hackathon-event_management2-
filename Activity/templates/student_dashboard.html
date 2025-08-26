@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-bg: #f8f9fa;
+        }
+
+        body {
+            background-color: #f5f6fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.4rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            margin-bottom: 1.5rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 2px solid #eee;
+            padding: 1.2rem;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .card-header h4 {
+            margin: 0;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .table {
+            margin: 0;
+        }
+
+        .table thead th {
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+            font-weight: 600;
+            border-bottom: 2px solid #eee;
+        }
+
+        .table td {
+            vertical-align: middle;
+            color: #444;
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+        }
+
+        .badge.bg-success {
+            background-color: var(--success-color) !important;
+        }
+
+        .badge.bg-warning {
+            background-color: var(--warning-color) !important;
+        }
+
+        .btn {
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            border: none;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+            color: white;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .form-control {
+            border-radius: 6px;
+            border: 2px solid #eee;
+            padding: 0.6rem 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: none;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, var(--accent-color), #2980b9);
+            color: white;
+        }
+
+        .summary-card .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .summary-card .card-header h4 {
+            color: white;
+        }
+
+        .summary-card .badge {
+            background-color: rgba(255,255,255,0.2) !important;
+            font-size: 1.2rem;
+        }
+        .messages-container {
+            height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+    
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+    
+        .message.student {
+            background-color: #e3f2fd;
+            margin-right: auto;
+        }
+    
+        .message.counsellor {
+            background-color: #f5f5f5;
+            margin-left: auto;
+        }
+    
+        .message-header {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+    
+        .message-content {
+            word-break: break-word;
+        }
+    
+        .message-timestamp {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 0.3rem;
+            text-align: right;
+        }
+    
+        #messageForm {
+            margin-top: 1rem;
+        }
+
+        .chatbot-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color), #2980b9);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-button i {
+            font-size: 24px;
+        }
+
+        .chat-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .chat-container.active {
+            display: flex;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--accent-color), #2980b9);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h5 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .bot-message, .user-message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .bot-message {
+            background: #f0f2f5;
+            margin-right: auto;
+        }
+
+        .user-message {
+            background: var(--accent-color);
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-input {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .chat-input button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: #2980b9;
+        }
+    
+        /* Custom animation for alerts */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .card-header {
+                padding: 1rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .table {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-award me-2"></i>Activity Points System
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-item nav-link text-light">
+                    <i class="fas fa-user me-2"></i>Welcome, {{ current_user.name }}
+                </span>
+                <a class="nav-item nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>{{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card summary-card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-chart-bar me-2"></i>Your Activity Points Summary</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>Total Verified Points: <span class="badge">{{ total_points }}</span></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-calendar-alt me-2"></i>Your Events</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Event Name</th>
+                                        <th>Club</th>
+                                        <th>Date</th>
+                                        <th>Points</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for event, club_name, date_added in events %}
+                                    <tr>
+                                        <td>{{ event.name }}</td>
+                                        <td>{{ club_name }}</td>
+                                        <td>{{ event.date.strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ event.points }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-primary btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#uploadModal"
+                                                    data-event-id="{{ event.id }}">
+                                                <i class="fas fa-upload me-1"></i>Upload
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center">No events found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-certificate me-2"></i>Your Certificates</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Points</th>
+                                        <th>Status</th>
+                                        <th>View</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cert in certificates %}
+                                    <tr>
+                                        <td>{{ cert.event.name }}</td>
+                                        <td>
+                                            {% if cert.verified %}
+                                                {{ cert.activity_points }}
+                                            {% elif cert.activity_points == 0 %}
+                                                Rejected
+                                            {% else %}
+                                                Pending
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if cert.verified %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check me-1"></i>Verified
+                                                </span>
+                                            {% elif cert.activity_points == 0 %}
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times me-1"></i>Rejected
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning">
+                                                    <i class="fas fa-clock me-1"></i>Pending
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info btn-sm me-2" onclick="showMessageModal({{ cert.id }})">
+                                                <i class="fas fa-comments me-1"></i>Messages
+                                            </button>
+                                            <a href="{{ url_for('view_certificate', certificate_id=cert.id) }}" 
+                                               class="btn btn-info btn-sm" 
+                                               target="_blank">
+                                                <i class="fas fa-eye me-1"></i>View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">No certificates uploaded</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Certificate Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-upload me-2"></i>Upload Certificate
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('upload_certificate') }}" method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="hidden" name="event_id" id="eventId">
+                        <div class="mb-3">
+                            <label for="certificate" class="form-label">
+                                <i class="fas fa-file-upload me-2"></i>Select Certificate (PDF/Image)
+                            </label>
+                            <input type="file" class="form-control" id="certificate" name="certificate" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload me-1"></i>Upload
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="messageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-comments me-2"></i>Messages
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="messagesContainer" class="messages-container mb-3">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                    <form id="messageForm" class="message-form">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="messageInput" 
+                                   placeholder="Type your message..." required>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chatbot-button" onclick="toggleChat()">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <h5><i class="fas fa-robot me-2"></i>Event Assistant</h5>
+            <button class="close-btn" onclick="toggleChat()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="bot-message">
+                Hi! I'm your event assistant. I can help you find events based on your interests. What are you interested in?
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type your interests...">
+            <button onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentCertificateId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+    var uploadModal = document.getElementById('uploadModal');
+    if (uploadModal) {
+        uploadModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var eventId = button.getAttribute('data-event-id');
+            var eventIdInput = uploadModal.querySelector('#eventId');
+            eventIdInput.value = eventId;
+        });
+    }
+
+    // Add hover effect to table rows
+    document.querySelectorAll('tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', () => {
+            row.style.backgroundColor = '#f8f9fa';
+            row.style.transition = 'background-color 0.3s ease';
+        });
+        row.addEventListener('mouseleave', () => {
+            row.style.backgroundColor = '';
+        });
+    });
+
+    // Auto-dismiss alerts after 5 seconds
+    document.querySelectorAll('.alert').forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s ease-out';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        }, 5000);
+    });
+});
+function loadMessages(certificateId) {
+    fetch(`/get_messages/${certificateId}`)
+        .then(response => response.json())
+        .then(messages => {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = '';
+            
+            messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.sender_type}`;
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <strong>${message.sender_name}</strong>
+                    </div>
+                    <div class="message-content">
+                        ${message.content}
+                    </div>
+                    <div class="message-timestamp">
+                        ${message.timestamp}
+                    </div>
+                `;
+                container.appendChild(messageDiv);
+            });
+            
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        })
+        .catch(error => console.error('Error loading messages:', error));
+}
+
+function showMessageModal(certificateId) {
+    currentCertificateId = certificateId;
+    loadMessages(certificateId);
+    const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+    modal.show();
+}
+
+document.getElementById('messageForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const input = document.getElementById('messageInput');
+    const content = input.value.trim();
+    
+    if (!content) return;
+    
+    const formData = new FormData();
+    formData.append('content', content);
+    
+    fetch(`/send_message/${currentCertificateId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            input.value = '';
+            loadMessages(currentCertificateId);
+        } else {
+            alert('Error sending message: ' + data.error);
+        }
+    })
+    .catch(error => console.error('Error sending message:', error));
+});
+
+// Add a message refresh interval
+setInterval(() => {
+    if (currentCertificateId && document.getElementById('messageModal').classList.contains('show')) {
+        loadMessages(currentCertificateId);
+    }
+}, 5000);
+// Add Chatbot JavaScript
+const events = {
+    coding: [
+        {name: "Capture the flag", club: "Coding Club"},
+        {name: "Friday night coding contest", club: "Coding Club"},
+        {name: "Kaggle competition", club: "Accelerate"}
+    ],
+    photography: [
+        {name: "SDG photography competition", club: "Spark"}
+    ],
+    social: [
+        {name: "Paper drive", club: "Rotaract"},
+        {name: "Shakti Siksha (Women Hygiene training)", club: "Spark"}
+    ],
+    entertainment: [
+        {name: "Treasure Hunt", club: "Raag"},
+        {name: "Acting competition", club: "CARV"}
+    ],
+    business: [
+        {name: "Alumni talk", club: "Accelerate"}
+    ]
+};
+
+const interestKeywords = {
+    coding: ["coding", "programming", "developer", "software", "computer", "tech", "kaggle", "hackathon"],
+    photography: ["photo", "camera", "picture", "photography", "capturing"],
+    social: ["social", "community", "help", "volunteer", "drive", "women", "hygiene"],
+    entertainment: ["fun", "entertainment", "acting", "drama", "treasure", "hunt", "game"],
+    business: ["business", "entrepreneurship", "startup", "corporate", "company", "professional"]
+};
+
+function toggleChat() {
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.classList.toggle('active');
+}
+
+function addMessage(message, isUser = false) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = isUser ? 'user-message' : 'bot-message';
+    messageDiv.textContent = message;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function findMatchingInterests(userInput) {
+    const matches = new Set();
+    const lowercaseInput = userInput.toLowerCase();
+    
+    for (const [category, keywords] of Object.entries(interestKeywords)) {
+        if (keywords.some(keyword => lowercaseInput.includes(keyword))) {
+            matches.add(category);
+        }
+    }
+    return Array.from(matches);
+}
+
+function generateResponse(matchingInterests) {
+    if (matchingInterests.length === 0) {
+        return "I couldn't quite understand your interests. Could you please be more specific? For example, are you interested in coding, photography, social work, entertainment, or business?";
+    }
+
+    let response = "Based on your interests, here are some events you might like:\n";
+    const recommendedEvents = new Set();
+
+    matchingInterests.forEach(interest => {
+        events[interest].forEach(event => {
+            recommendedEvents.add(`${event.name} by ${event.club}`);
+        });
+    });
+
+    return response + Array.from(recommendedEvents).join('\n');
+}
+
+function sendMessage() {
+    const input = document.getElementById('userInput');
+    const userMessage = input.value.trim();
+    
+    if (userMessage === '') return;
+    
+    addMessage(userMessage, true);
+    
+    const matchingInterests = findMatchingInterests(userMessage);
+    const botResponse = generateResponse(matchingInterests);
+    
+    setTimeout(() => {
+        addMessage(botResponse);
+    }, 500);
+    
+    input.value = '';
+}
+
+document.getElementById('userInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+    </script>
+</body>
+</html>

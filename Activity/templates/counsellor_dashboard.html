@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counsellor Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+        }
+
+        body {
+            background-color: #f5f6fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: white !important;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+            margin-bottom: 2rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: var(--light-gray);
+            border-bottom: none;
+            padding: 1.5rem;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .card-header h4 {
+            margin: 0;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .table {
+            margin: 0;
+        }
+
+        .table thead th {
+            background-color: var(--light-gray);
+            color: var(--primary-color);
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            padding: 1rem;
+        }
+
+        .table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .btn {
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border: none;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+            border-color: #138496;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background-color: var(--light-gray);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+            padding: 1.5rem;
+        }
+
+        .modal-confirm .modal-header {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .modal-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .modal-confirm .modal-title {
+            color: white;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            border-top: none;
+            padding: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            border-color: var(--accent-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .empty-state {
+            padding: 2rem;
+            text-align: center;
+            color: var(--secondary-color);
+        }
+
+        .btn-group-modal {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+        .messages-container {
+            height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+    
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+    
+        .message.student {
+            background-color: #e3f2fd;
+            margin-right: auto;
+        }
+    
+        .message.counsellor {
+            background-color: #f5f5f5;
+            margin-left: auto;
+        }
+    
+        .message-header {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+    
+        .message-content {
+            word-break: break-word;
+        }
+    
+        .message-timestamp {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 0.3rem;
+            text-align: right;
+        }
+    
+        #messageForm {
+            margin-top: 1rem;
+        }
+    
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-award me-2"></i>Activity Points System
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-item nav-link" href="{{ url_for('manage_students') }}">
+                    <i class="fas fa-users me-2"></i>Manage Students
+                </a>
+                <span class="nav-item nav-link">
+                    <i class="fas fa-user me-2"></i>{{ current_user.name }}
+                </span>
+                <a class="nav-item nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-certificate me-2"></i>Pending Certificates</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>USN</th>
+                                <th>Event</th>
+                                <th>Suggested Points</th>
+                                <th>Certificate</th>
+                                <th>Action</th>
+                                <th>Communication</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cert, student_name, student_usn, event_name, event_points in pending_certificates %}
+                            <tr>
+                                <td>
+                                    <i class="fas fa-user-graduate me-2"></i>
+                                    {{ student_name }}
+                                </td>
+                                <td>{{ student_usn }}</td>
+                                <td>{{ event_name }}</td>
+                                <td>{{ event_points }}</td>
+                                <td>
+                                    <a href="{{ url_for('counsellor_view_certificate', cert_id=cert.id) }}" 
+                                       class="btn btn-info btn-sm" 
+                                       target="_blank">
+                                        <i class="fas fa-eye me-2"></i>View Certificate
+                                    </a>
+                                </td>
+                                <td class="action-buttons">
+                                    <button type="button" 
+                                            class="btn btn-primary btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#verifyModal"
+                                            data-cert-id="{{ cert.id }}"
+                                            data-points="{{ event_points }}">
+                                        <i class="fas fa-check me-2"></i>Verify
+                                    </button>
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#rejectModal"
+                                            data-cert-id="{{ cert.id }}">
+                                        <i class="fas fa-times me-2"></i>Reject
+                                    </button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-info btn-sm" onclick="showMessageModal({{ cert.id }})">
+                                        <i class="fas fa-comments me-1"></i>Messages
+                                    </button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                                    <p class="mb-0">No pending certificates</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verify Certificate Modal -->
+    <div class="modal fade" id="verifyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Verify Certificate
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="verifyForm" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="points" class="form-label">Assign Points</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="points" 
+                                   name="points" 
+                                   required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check me-2"></i>Verify
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Certificate Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1">
+        <div class="modal-dialog modal-confirm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Reject Certificate
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="rejectForm" method="POST">
+                    <div class="modal-body text-center">
+                        <p>Are you sure you want to reject this certificate?</p>
+                        <p class="text-muted small">This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="btn-group-modal">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-check me-2"></i>Reject
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="messageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-comments me-2"></i>Messages
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="messagesContainer" class="messages-container mb-3">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                    <form id="messageForm" class="message-form">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="messageInput" 
+                                   placeholder="Type your message..." required>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentCertificateId = null;
+
+        // Verify modal functionality
+        const verifyModal = document.getElementById('verifyModal');
+        verifyModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const certId = button.getAttribute('data-cert-id');
+            const points = button.getAttribute('data-points');
+            const form = verifyModal.querySelector('#verifyForm');
+            const pointsInput = verifyModal.querySelector('#points');
+            
+            form.action = '/counsellor/verify_certificate/' + certId;
+            pointsInput.value = points;
+        });
+
+        // Reject modal functionality
+        const rejectModal = document.getElementById('rejectModal');
+        rejectModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const certId = button.getAttribute('data-cert-id');
+            const form = rejectModal.querySelector('#rejectForm');
+            
+            form.action = '/counsellor/reject_certificate/' + certId;
+        });
+
+        // Table row hover effect
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.backgroundColor = '#f8f9fa';
+                row.style.transition = 'background-color 0.3s ease';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.backgroundColor = '';
+            });
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                alert.style.transition = 'opacity 0.5s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }, 5000);
+        });
+        function loadMessages(certificateId) {
+            fetch(`/get_messages/${certificateId}`)
+                .then(response => response.json())
+                .then(messages => {
+                    const container = document.getElementById('messagesContainer');
+                    container.innerHTML = '';
+                    
+                    messages.forEach(message => {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `message ${message.sender_type}`;
+                        messageDiv.innerHTML = `
+                            <div class="message-header">
+                                <strong>${message.sender_name}</strong>
+                            </div>
+                            <div class="message-content">
+                                ${message.content}
+                            </div>
+                            <div class="message-timestamp">
+                                ${message.timestamp}
+                            </div>
+                        `;
+                        container.appendChild(messageDiv);
+                    });
+                    
+                    // Scroll to bottom
+                    container.scrollTop = container.scrollHeight;
+                })
+                .catch(error => console.error('Error loading messages:', error));
+        }
+        
+        function showMessageModal(certificateId) {
+            currentCertificateId = certificateId;
+            loadMessages(certificateId);
+            const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+            modal.show();
+        }
+        
+        document.getElementById('messageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+            
+            if (!content) return;
+            
+            const formData = new FormData();
+            formData.append('content', content);
+            
+            fetch(`/send_message/${currentCertificateId}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    input.value = '';
+                    loadMessages(currentCertificateId);
+                } else {
+                    alert('Error sending message: ' + data.error);
+                }
+            })
+            .catch(error => console.error('Error sending message:', error));
+        });
+        
+        // Add a message refresh interval
+        setInterval(() => {
+            if (currentCertificateId && document.getElementById('messageModal').classList.contains('show')) {
+                loadMessages(currentCertificateId);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Activity Points System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+
+        .role-specific-fields {
+            margin-top: 1rem;
+        }
+
+        .error {
+            color: #d32f2f;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        button {
+            background: #1a73e8;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #1557b0;
+        }
+
+        .flash-messages {
+            margin-bottom: 1rem;
+        }
+
+        .flash-message {
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .login-link a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sign Up</h1>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form id="signupForm" action="{{ url_for('signup') }}" method="POST">
+            <div class="form-group">
+                <label for="userType">User Type*</label>
+                <select id="userType" name="user_type" required>
+                    <option value="">Select user type</option>
+                    <option value="student">Student</option>
+                    <option value="club">Club</option>
+                    <option value="counsellor">Counsellor</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email*</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password*</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password*</label>
+                <input type="password" id="confirmPassword" required>
+            </div>
+
+            <!-- Student-specific fields -->
+            <div id="studentFields" class="role-specific-fields hidden">
+                <div class="form-group">
+                    <label for="usn">USN*</label>
+                    <input type="text" id="usn" name="usn">
+                </div>
+                <div class="form-group">
+                    <label for="studentName">Full Name*</label>
+                    <input type="text" id="studentName" name="studentName">
+                </div>
+                <div class="form-group">
+                    <label for="branch">Branch*</label>
+                    <input type="text" id="branch" name="branch">
+                </div>
+                <div class="form-group">
+                    <label for="year">Year*</label>
+                    <input type="number" id="year" name="year" min="1" max="4">
+                </div>
+                <div class="form-group">
+                    <label for="courseId">Course ID*</label>
+                    <input type="text" id="courseId" name="course_id">
+                </div>
+            </div>
+
+            <!-- Club-specific fields -->
+            <div id="clubFields" class="role-specific-fields hidden">
+                <div class="form-group">
+                    <label for="clubName">Club Name*</label>
+                    <input type="text" id="clubName" name="clubName">
+                </div>
+                <div class="form-group">
+                    <label for="coreTeam">Core Team Members*</label>
+                    <input type="text" id="coreTeam" name="coreTeam">
+                </div>
+                <div class="form-group">
+                    <label for="clubHead">Club Head*</label>
+                    <input type="text" id="clubHead" name="clubHead">
+                </div>
+            </div>
+
+            <!-- Counsellor-specific fields -->
+            <div id="counsellorFields" class="role-specific-fields hidden">
+                <div class="form-group">
+                    <label for="counsellorName">Full Name*</label>
+                    <input type="text" id="counsellorName" name="counsellorName">
+                </div>
+                <div class="form-group">
+                    <label for="counsellorBranch">Branch*</label>
+                    <input type="text" id="counsellorBranch" name="branch">
+                </div>
+                <div class="form-group">
+                    <label for="batch">Batch*</label>
+                    <input type="text" id="batch" name="batch">
+                </div>
+            </div>
+
+            <button type="submit">Sign Up</button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('signupForm');
+            const userTypeSelect = document.getElementById('userType');
+            const studentFields = document.getElementById('studentFields');
+            const clubFields = document.getElementById('clubFields');
+            const counsellorFields = document.getElementById('counsellorFields');
+            
+            // Show/hide role-specific fields based on user type selection
+            userTypeSelect.addEventListener('change', function() {
+                // Hide all fields first
+                studentFields.classList.add('hidden');
+                clubFields.classList.add('hidden');
+                counsellorFields.classList.add('hidden');
+                
+                // Remove required attribute from all role-specific inputs
+                document.querySelectorAll('.role-specific-fields input').forEach(input => {
+                    input.removeAttribute('required');
+                });
+                
+                // Show and make required the selected role's fields
+                switch(this.value) {
+                    case 'student':
+                        studentFields.classList.remove('hidden');
+                        studentFields.querySelectorAll('input').forEach(input => {
+                            input.setAttribute('required', '');
+                        });
+                        break;
+                    case 'club':
+                        clubFields.classList.remove('hidden');
+                        clubFields.querySelectorAll('input').forEach(input => {
+                            input.setAttribute('required', '');
+                        });
+                        break;
+                    case 'counsellor':
+                        counsellorFields.classList.remove('hidden');
+                        counsellorFields.querySelectorAll('input').forEach(input => {
+                            input.setAttribute('required', '');
+                        });
+                        break;
+                }
+            });
+
+            // Form validation before submission
+            form.addEventListener('submit', function(e) {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Passwords do not match!');
+                    return false;
+                }
+                
+                // Additional validation for required fields based on user type
+                const userType = userTypeSelect.value;
+                let valid = true;
+                
+                if (userType === 'student') {
+                    studentFields.querySelectorAll('input[required]').forEach(input => {
+                        if (!input.value) {
+                            valid = false;
+                            input.style.borderColor = 'red';
+                        }
+                    });
+                } else if (userType === 'club') {
+                    clubFields.querySelectorAll('input[required]').forEach(input => {
+                        if (!input.value) {
+                            valid = false;
+                            input.style.borderColor = 'red';
+                        }
+                    });
+                } else if (userType === 'counsellor') {
+                    counsellorFields.querySelectorAll('input[required]').forEach(input => {
+                        if (!input.value) {
+                            valid = false;
+                            input.style.borderColor = 'red';
+                        }
+                    });
+                }
+                
+                if (!valid) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields!');
+                    return false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

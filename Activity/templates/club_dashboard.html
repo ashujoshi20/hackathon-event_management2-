@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --light-gray: #f8f9fa;
+            --border-radius: 8px;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: white !important;
+        }
+
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding: 1.25rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background-color: #219a52;
+        }
+
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            background-color: var(--light-gray);
+            border-bottom: 2px solid #dee2e6;
+            color: var(--primary-color);
+            font-weight: 600;
+            padding: 1rem;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: var(--border-radius);
+        }
+
+        .modal-header {
+            background-color: var(--light-gray);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding: 1.25rem;
+        }
+
+        .form-label {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .form-control {
+            border-radius: var(--border-radius);
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .alert {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        .text-light {
+            color: white !important;
+        }
+
+        /* Custom animation for modals */
+        .modal.fade .modal-dialog {
+            transform: scale(0.8);
+            transition: transform 0.3s ease-out;
+        }
+
+        .modal.show .modal-dialog {
+            transform: scale(1);
+        }
+        #participantTabs .nav-link {
+            color: #007bff; /* Blue text */
+            background-color: #f8f9fa; /* Light gray background */
+            border: 1px solid #dee2e6; /* Light border */
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+        #participantTabs .nav-link.active {
+            background-color: #007bff; /* Blue background */
+            color: white; /* White text */
+            border-color: #007bff #007bff #fff; /* Adjust border */
+        }
+        #participantTabs .nav-link:hover {
+            background-color: #0056b3; /* Darker blue */
+            color: white;
+        }        
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-chart-line me-2"></i>
+                Activity Points System
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-item nav-link text-light">
+                    <i class="fas fa-user-circle me-2"></i>
+                    Welcome, {{ club.name }}
+                </span>
+                <a class="nav-item nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Events
+                        </h4>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEventModal">
+                            <i class="fas fa-plus me-2"></i>
+                            Create New Event
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Event Name</th>
+                                        <th>Date</th>
+                                        <th>Place</th>
+                                        <th>Points</th>
+                                        <th>Participants</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for event in events %}
+                                    <tr>
+                                        <td>
+                                            <i class="fas fa-calendar-day me-2 text-muted"></i>
+                                            {{ event.name }}
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-clock me-2 text-muted"></i>
+                                            {{ event.date.strftime('%Y-%m-%d') }}
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                                            {{ event.place }}
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-star me-2 text-warning"></i>
+                                            {{ event.points }}
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-users me-2 text-muted"></i>
+                                            {{ event.participants or 0 }}
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#addParticipantModal"
+                                                    data-event-id="{{ event.id }}"
+                                                    data-event-name="{{ event.name }}">
+                                                <i class="fas fa-user-plus me-2"></i>
+                                                Add Participant
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No events created yet
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Event Modal -->
+    <div class="modal fade" id="createEventModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        Create New Event
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('create_event') }}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="eventName" class="form-label">Event Name</label>
+                            <input type="text" class="form-control" id="eventName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventDate" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="eventDate" name="date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventPlace" class="form-label">Place</label>
+                            <input type="text" class="form-control" id="eventPlace" name="place" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventPoints" class="form-label">Activity Points</label>
+                            <input type="number" class="form-control" id="eventPoints" name="points" required min="0">
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventParticipants" class="form-label">Expected Participants</label>
+                            <input type="number" class="form-control" id="eventParticipants" name="participants" required min="0">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check me-2"></i>
+                            Create Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Participant Modal -->
+    <div class="modal fade" id="addParticipantModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Add Participant
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ url_for('add_participant') }}" method="POST">
+                    <div class="modal-body">
+                        <input type="hidden" name="event_id" id="participantEventId">
+                        <div class="mb-3">
+                            <label class="form-label">Event Name</label>
+                            <input type="text" class="form-control" id="participantEventName" readonly>
+                        </div>
+                        <ul class="nav nav-tabs mb-3" id="participantTabs" role="tablist" >
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="single-tab" data-bs-toggle="tab" data-bs-target="#single" type="button" role="tab">
+                                    <i class="fas fa-user me-2"></i>Single Participant
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="bulk-tab" data-bs-toggle="tab" data-bs-target="#bulk" type="button" role="tab">
+                                    <i class="fas fa-file-upload me-2"></i>Bulk Upload
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="participantTabsContent">
+                            <div class="tab-pane fade show active" id="single" role="tabpanel">
+                                <div class="mb-3">
+                                    <label for="studentUSN" class="form-label">Student USN</label>
+                                    <input type="text" class="form-control" id="studentUSN" name="usn" required>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="bulk" role="tabpanel">
+                                <div class="mb-3">
+                                    <label for="participantsFile" class="form-label" >Upload Participants File</label>
+                                    <input type="file" class="form-control" id="participantsFile" accept=".csv,.xlsx">
+                                    <small class="form-text text-muted">
+                                        Upload CSV or Excel file with 'usn' column. Number of USNs should not exceed expected participants.
+                                    </small>
+                                </div>
+                                <div id="uploadProgress" class="progress d-none mb-2">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <div id="uploadMessage" class="alert d-none"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>
+                            Add Participant
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set up add participant modal
+        var addParticipantModal = document.getElementById('addParticipantModal')
+        addParticipantModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget
+            var eventId = button.getAttribute('data-event-id')
+            var eventName = button.getAttribute('data-event-name')
+            
+            var eventIdInput = addParticipantModal.querySelector('#participantEventId')
+            var eventNameInput = addParticipantModal.querySelector('#participantEventName')
+            
+            eventIdInput.value = eventId
+            eventNameInput.value = eventName
+        })
+
+        // Clear form fields when modals are closed
+        var modals = document.querySelectorAll('.modal')
+        modals.forEach(function(modal) {
+            modal.addEventListener('hidden.bs.modal', function (event) {
+                var forms = modal.querySelectorAll('form')
+                forms.forEach(function(form) {
+                    form.reset()
+                })
+            })
+        })
+
+        // Add hover effect to buttons
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-1px)'
+            })
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)'
+            })
+        })
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('participantsFile');
+            const progressBar = document.getElementById('uploadProgress');
+            const uploadMessage = document.getElementById('uploadMessage');
+            const form = document.querySelector('#addParticipantModal form');
+            
+            // Handle file upload
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const eventId = document.getElementById('participantEventId').value;
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                // Show progress bar
+                progressBar.classList.remove('d-none');
+                progressBar.querySelector('.progress-bar').style.width = '0%';
+                uploadMessage.classList.add('d-none');
+                
+                fetch(`/club/upload_participants/${eventId}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    progressBar.querySelector('.progress-bar').style.width = '100%';
+                    
+                    if (data.success) {
+                        uploadMessage.classList.remove('d-none', 'alert-danger');
+                        uploadMessage.classList.add('alert-success');
+                        uploadMessage.textContent = data.message;
+                        
+                        // Reset file input
+                        fileInput.value = '';
+                        
+                        // Refresh page after 2 seconds
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        throw new Error(data.error);
+                    }
+                })
+                .catch(error => {
+                    progressBar.querySelector('.progress-bar').style.width = '100%';
+                    uploadMessage.classList.remove('d-none', 'alert-success');
+                    uploadMessage.classList.add('alert-danger');
+                    uploadMessage.textContent = error.message;
+                });
+            });
+            
+            // Reset file upload form when modal is closed
+            const modal = document.getElementById('addParticipantModal');
+            modal.addEventListener('hidden.bs.modal', function() {
+                fileInput.value = '';
+                progressBar.classList.add('d-none');
+                uploadMessage.classList.add('d-none');
+            });
+        });
+
+    </script>
+</body>
+</html>
